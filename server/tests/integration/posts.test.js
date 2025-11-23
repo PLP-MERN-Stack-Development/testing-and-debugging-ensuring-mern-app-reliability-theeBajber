@@ -15,7 +15,16 @@ let postId;
 
 // Setup in-memory MongoDB server before all tests
 beforeAll(async () => {
-  mongoServer = await MongoMemoryServer.create();
+  // Disconnect if already connected (from setup.js)
+  if (mongoose.connection.readyState !== 0) {
+    await mongoose.disconnect();
+  }
+
+  mongoServer = await MongoMemoryServer.create({
+    instance: {
+      launchTimeout: 60000,
+    },
+  });
   const mongoUri = mongoServer.getUri();
   await mongoose.connect(mongoUri);
 
@@ -33,28 +42,40 @@ beforeAll(async () => {
     title: 'Test Post',
     content: 'This is a test post content',
     author: userId,
-    category: mongoose.Types.ObjectId(),
+    category: 'tech',
     slug: 'test-post',
+    status: 'published',
   });
   postId = post._id;
-});
+}, 60000);
 
 // Clean up after all tests
 afterAll(async () => {
   await mongoose.disconnect();
-  await mongoServer.stop();
-});
+  if (mongoServer) {
+    await mongoServer.stop();
+  }
+}, 60000);
 
 // Clean up database between tests
+beforeEach(async () => {
+  // Recreate the test post before each test to ensure it exists
+  await Post.deleteMany({ _id: postId });
+  const post = await Post.create({
+    title: 'Test Post',
+    content: 'This is a test post content',
+    author: userId,
+    category: 'tech',
+    slug: 'test-post',
+    status: 'published',
+    _id: postId,
+  });
+});
+
 afterEach(async () => {
-  // Keep the test user and post, but clean up any other created data
-  const collections = mongoose.connection.collections;
-  for (const key in collections) {
-    const collection = collections[key];
-    if (collection.collectionName !== 'users' && collection.collectionName !== 'posts') {
-      await collection.deleteMany({});
-    }
-  }
+  // Clean up additional users and posts created during tests
+  await User.deleteMany({ _id: { $ne: userId } });
+  await Post.deleteMany({ _id: { $ne: postId } });
 });
 
 describe('POST /api/posts', () => {
@@ -62,7 +83,7 @@ describe('POST /api/posts', () => {
     const newPost = {
       title: 'New Test Post',
       content: 'This is a new test post content',
-      category: mongoose.Types.ObjectId().toString(),
+      category: 'tech',
     };
 
     const res = await request(app)
@@ -74,14 +95,14 @@ describe('POST /api/posts', () => {
     expect(res.body).toHaveProperty('_id');
     expect(res.body.title).toBe(newPost.title);
     expect(res.body.content).toBe(newPost.content);
-    expect(res.body.author).toBe(userId.toString());
+    expect(res.body.author._id).toBe(userId.toString());
   });
 
   it('should return 401 if not authenticated', async () => {
     const newPost = {
       title: 'Unauthorized Post',
       content: 'This should not be created',
-      category: mongoose.Types.ObjectId().toString(),
+      category: 'lifestyle',
     };
 
     const res = await request(app)
@@ -95,7 +116,7 @@ describe('POST /api/posts', () => {
     const invalidPost = {
       // Missing title
       content: 'This post is missing a title',
-      category: mongoose.Types.ObjectId().toString(),
+      category: 'business',
     };
 
     const res = await request(app)
@@ -118,7 +139,7 @@ describe('GET /api/posts', () => {
   });
 
   it('should filter posts by category', async () => {
-    const categoryId = mongoose.Types.ObjectId().toString();
+    const categoryId = 'travel';
     
     // Create a post with specific category
     await Post.create({
@@ -141,12 +162,13 @@ describe('GET /api/posts', () => {
   it('should paginate results', async () => {
     // Create multiple posts
     const posts = [];
+    const categories = ['tech', 'lifestyle', 'business', 'travel', 'other'];
     for (let i = 0; i < 15; i++) {
       posts.push({
         title: `Pagination Post ${i}`,
         content: `Content for pagination test ${i}`,
         author: userId,
-        category: mongoose.Types.ObjectId(),
+        category: categories[i % categories.length],
         slug: `pagination-post-${i}`,
       });
     }
@@ -177,7 +199,7 @@ describe('GET /api/posts/:id', () => {
   });
 
   it('should return 404 for non-existent post', async () => {
-    const nonExistentId = mongoose.Types.ObjectId();
+    const nonExistentId = new mongoose.Types.ObjectId();
     const res = await request(app)
       .get(`/api/posts/${nonExistentId}`);
 

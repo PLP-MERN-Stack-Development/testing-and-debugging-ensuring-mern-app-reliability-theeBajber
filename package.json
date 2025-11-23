@@ -1,0 +1,49 @@
+{
+  "name": "mern-testing-assignment",
+  "version": "1.0.0",
+  "description": "MERN stack application with comprehensive testing",
+  "main": "index.js",
+  "scripts": {
+    "test": "npm run test:unit && npm run test:integration",
+    "test:unit": "jest --selectProjects client --testPathPattern=\"unit\" --selectProjects server --testPathPattern=\"unit\"",
+    "test:integration": "jest --selectProjects client --testPathPattern=\"integration\" --selectProjects server --testPathPattern=\"integration\"",
+    "test:e2e": "cypress run",
+    "test:e2e:open": "cypress open",
+    "test:coverage": "jest --coverage",
+    "test:watch": "jest --watch",
+    "test:server": "jest --selectProjects server",
+    "test:client": "jest --selectProjects client",
+    "install-all": "npm install && cd client && npm install && cd ../server && npm install",
+    "setup-test-db": "cd server && node scripts/setupTestDB.js",
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "server": "cd server && npm run dev",
+    "client": "cd client && npm start",
+    "build": "cd client && npm run build"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.22.0",
+    "@babel/preset-env": "^7.22.0",
+    "@babel/preset-react": "^7.22.0",
+    "babel-jest": "^29.0.0",
+    "concurrently": "^7.6.0",
+    "cypress": "^12.0.0",
+    "identity-obj-proxy": "^3.0.0",
+    "jest": "^29.0.0",
+    "jest-environment-jsdom": "^30.2.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "keywords": [
+    "mern",
+    "testing",
+    "jest",
+    "cypress",
+    "mongodb",
+    "express",
+    "react",
+    "node"
+  ],
+  "author": "Student",
+  "license": "MIT"
+}

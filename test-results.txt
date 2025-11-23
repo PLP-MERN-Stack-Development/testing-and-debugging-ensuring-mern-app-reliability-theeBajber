@@ -1,0 +1,118 @@
+
+> mern-testing-assignment@1.0.0 test
+> npm run test:unit && npm run test:integration
+
+
+> mern-testing-assignment@1.0.0 test:unit
+> jest --selectProjects client --testPathPattern="unit" --selectProjects server --testPathPattern="unit"
+
+Running 2 projects:
+- client
+- server
+  console.error
+    Warning: `ReactDOMTestUtils.act` is deprecated in favor of `React.act`. Import `act` from `react` instead of `react-dom/test-utils`. See https://react.dev/warnings/react-dom-test-utils for more info.
+
+    [0m [90m  6 |[39m describe([32m'Button Component'[39m[33m,[39m () [33m=>[39m {
+     [90m  7 |[39m   it([32m'should render button with correct text'[39m[33m,[39m () [33m=>[39m {
+    [31m[1m>[22m[39m[90m  8 |[39m     render([33m<[39m[33mButton[39m[33m>[39m[33mClick[39m me[33m<[39m[33m/[39m[33mButton[39m[33m>[39m)[33m;[39m
+     [90m    |[39m           [31m[1m^[22m[39m
+     [90m  9 |[39m     
+     [90m 10 |[39m     [36mconst[39m button [33m=[39m screen[33m.[39mgetByTestId([32m'button'[39m)[33m;[39m
+     [90m 11 |[39m     expect(button)[33m.[39mtoBeInTheDocument()[33m;[39m[0m
+
+      at printWarning (client/node_modules/react-dom/cjs/react-dom-test-utils.development.js:71:30)
+      at error (client/node_modules/react-dom/cjs/react-dom-test-utils.development.js:45:7)
+      at actWithWarning (client/node_modules/react-dom/cjs/react-dom-test-utils.development.js:1736:7)
+      at client/node_modules/@testing-library/react/dist/act-compat.js:63:25
+      at renderRoot (client/node_modules/@testing-library/react/dist/pure.js:159:26)
+      at render (client/node_modules/@testing-library/react/dist/pure.js:246:10)
+      at Object.<anonymous> (client/src/tests/unit/Button.test.jsx:8:11)
+
+PASS client client/src/tests/unit/Button.test.jsx (24.362 s)
+  Button Component
+    √ should render button with correct text (415 ms)
+    √ should call onClick when clicked (11 ms)
+    √ should not call onClick when disabled (7 ms)
+    √ should not call onClick when loading (9 ms)
+    √ should be disabled when disabled prop is true (6 ms)
+    √ should show loading state when loading prop is true (5 ms)
+    √ should apply correct variant classes (7 ms)
+    √ should use primary variant for invalid variant (4 ms)
+    √ should apply custom className (3 ms)
+    √ should support custom data-testid (3 ms)
+    √ should set button type correctly (3 ms)
+    √ should handle onClick with undefined handler (3 ms)
+    √ should show children when not loading (4 ms)
+
+FAIL server server/tests/unit/models/Post.test.js (68.492 s)
+  Post Model
+    × should create a post with valid fields (54 ms)
+    √ should require title field (11 ms)
+    √ should require author field (6 ms)
+    × should generate slug from title if not provided (12 ms)
+    × should not allow duplicate slugs (6 ms)
+    × should trim title and content (6 ms)
+    √ should validate status enum values (4 ms)
+
+  ● Post Model › should create a post with valid fields
+
+    ValidationError: Post validation failed: category: `6921d02295e02bcb7bd4981e` is not a valid enum value for path `category`.
+
+      at model.Object.<anonymous>.Document.invalidate (server/node_modules/mongoose/lib/document.js:3219:32)
+      at server/node_modules/mongoose/lib/document.js:3012:17
+      at server/node_modules/mongoose/lib/schematype.js:1368:9
+
+  ● Post Model › should generate slug from title if not provided
+
+    ValidationError: Post validation failed: category: `6921d02295e02bcb7bd4982c` is not a valid enum value for path `category`.
+
+      at model.Object.<anonymous>.Document.invalidate (server/node_modules/mongoose/lib/document.js:3219:32)
+      at server/node_modules/mongoose/lib/document.js:3012:17
+      at server/node_modules/mongoose/lib/schematype.js:1368:9
+
+  ● Post Model › should not allow duplicate slugs
+
+    ValidationError: Post validation failed: category: `6921d02295e02bcb7bd49831` is not a valid enum value for path `category`.
+
+      at model.Object.<anonymous>.Document.invalidate (server/node_modules/mongoose/lib/document.js:3219:32)
+      at server/node_modules/mongoose/lib/document.js:3012:17
+      at server/node_modules/mongoose/lib/schematype.js:1368:9
+
+  ● Post Model › should trim title and content
+
+    ValidationError: Post validation failed: category: `6921d02295e02bcb7bd49835` is not a valid enum value for path `category`.
+
+      at model.Object.<anonymous>.Document.invalidate (server/node_modules/mongoose/lib/document.js:3219:32)
+      at server/node_modules/mongoose/lib/document.js:3012:17
+      at server/node_modules/mongoose/lib/schematype.js:1368:9
+
+PASS server server/tests/unit/utils/auth.test.js (71.791 s)
+  Auth Utilities
+    generateToken
+      √ should generate a valid JWT token (32 ms)
+    verifyToken
+      √ should verify a valid token (3 ms)
+      √ should throw error for invalid token (61 ms)
+      √ should throw error for expired token (3 ms)
+    hashPassword
+      √ should hash a password (478 ms)
+    comparePassword
+      √ should return true for matching passwords (869 ms)
+      √ should return false for non-matching passwords (905 ms)
+
+------------------------------|---------|----------|---------|---------|-------------------
+File                          | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s 
+------------------------------|---------|----------|---------|---------|-------------------
+All files                     |     100 |      100 |     100 |     100 |                   
+ client/src/components/common |     100 |      100 |     100 |     100 |                   
+  Button.jsx                  |     100 |      100 |     100 |     100 |                   
+ server/src/models            |     100 |      100 |     100 |     100 |                   
+  Post.js                     |     100 |      100 |     100 |     100 |                   
+ server/src/utils             |     100 |      100 |     100 |     100 |                   
+  auth.js                     |     100 |      100 |     100 |     100 |                   
+------------------------------|---------|----------|---------|---------|-------------------
+Test Suites: 1 failed, 2 passed, 3 total
+Tests:       4 failed, 23 passed, 27 total
+Snapshots:   0 total
+Time:        77.644 s
+Ran all test suites matching /unit|unit/i in 2 projects.
